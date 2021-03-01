@@ -1,0 +1,78 @@
+# 项目config 唯一标识name
+spring:
+  application:
+    name: eureka-server
+server:
+  port: 8761
+
+#单点，独立Eureka服务配置
+eureka:
+  instance:
+    hostname: localhost
+    metadataMap:
+      instanceId: ${spring.application.name}:${random.value}
+  client:
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+    fetch-registry: false
+    register-with-eureka: false
+
+
+#权限认证
+security:
+  basic:
+    enabled: false
+  user:
+    name: eureka
+    password: 123456
+
+# 安全认证
+management:
+  security:
+    enabled: false
+
+
+#对等意识，集群Eureka服务器配置
+---
+spring:
+  application:
+    name: spring-cloud-eureka
+  profiles: peer1
+server:
+  port: 8001
+eureka:
+  instance:
+    hostname: peer1
+  client:
+    serviceUrl:
+      defaultZone: http://peer2:8002/eureka/,http://peer3:8003/eureka/
+---
+spring:
+  application:
+    name: spring-cloud-eureka
+  profiles: peer2
+server:
+  port: 8002
+eureka:
+  instance:
+    hostname: peer2
+  client:
+    serviceUrl:
+      defaultZone: http://peer1:8001/eureka/,http://peer3:8003/eureka/
+---
+spring:
+  application:
+    name: spring-cloud-eureka
+  profiles: peer3
+server:
+  port: 8003
+eureka:
+  instance:
+    hostname: peer3
+  client:
+    serviceUrl:
+      defaultZone: http://peer1:8001/eureka/,http://peer2:8002/eureka/
+
+
+
+
